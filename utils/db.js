@@ -17,6 +17,7 @@ class DBClient {
         try{
             const client = new MongoClient(url);
             this.client = await client.connect();
+            console.log('Connected to DB mongodb');
             this.db = this.client.db(dbName);
             this.User = this.db.collection('users');
             this.File = this.db.collection('files');
