@@ -6,7 +6,9 @@ exports.postNew = async (req, res)=>{
         const {email, password} = req.body;
         if(!email) throw new Error('Missing email');
         if(!password) throw new Error('Missing password');
+        console.log(email);
         const user = await dbClient.User.findOne({email});
+        console.log(user);
         if (user) throw new Error('Already exist');
         const hahsedPassword = sha1(password);
         const newUser = await dbClient.User.insertOne({email, password: hahsedPassword});
