@@ -17,7 +17,13 @@ router.post('/encodedCredentials', AuthContraller.getEncodedCredentials);
 router.get('/connect', AuthContraller.getConnect);
 router.get('/disconnect', AuthContraller.gitDisconnect);
 router.get('/users/me', AuthContraller.getMe);
-router.post('/files', FilesController.addFile);
+
+// files routes
+router.post('/files', FilesController.postUpload);
+router.get('/files/:id', FilesController.getShow);
+router.get('/files', FilesController.getIndex);
+router.put('/files/:id/publish', FilesController.putPublish);
+router.put('/files/:id/unpublish', FilesController.putUnpublish);
 
 
 module.exports = router;

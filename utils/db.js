@@ -43,12 +43,4 @@ class DBClient {
 }
 
 const dbClient = new DBClient();
-// async function main() {
-//     await dbClient.connect();
-//     console.log(dbClient.isAlive());
-//     console.log(await dbClient.nbUsers());
-//     console.log(await dbClient.nbFiles());
-//     console.log('sasasa');
-// }
-// main();
 module.exports = dbClient;

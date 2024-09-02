@@ -4,7 +4,7 @@ const {ObjectId} = require('mongodb');
 const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
-exports.addFile = async(req, res)=>{
+exports.postUpload = async(req, res)=>{
     try{
         const token = req.headers['x-token'];
         const tokenKey = `auth_${token}`;
@@ -12,7 +12,7 @@ exports.addFile = async(req, res)=>{
         const user_id = new ObjectId(str_id);
         const user = await dbClient.User.findOne({_id: user_id});
         if (!user){
-            res.status(401).json({error: 'Unauthorized'});
+            return res.status(401).json({error: 'Unauthorized'});
         };
         let {name, type, parentId, isPublic, data} = req.body;
         if (!name) throw new Error('Missing name');
@@ -26,7 +26,6 @@ exports.addFile = async(req, res)=>{
         }
         if(parentId && parentId !== "0"){
             parentId = new ObjectId(parentId);
-            console.log(parentId);
             const parent = await dbClient.File.findOne({_id: parentId});
             if(!parent) throw new Error('Parent not found');
             if(parent.type !== 'folder') throw new Error('Parent is not a folder');
@@ -42,7 +41,8 @@ exports.addFile = async(req, res)=>{
             const folder = await dbClient.File.insertOne(newFile);
             // newFile.id = folder.insertedId;
             newFile = {id: folder.insertedId, ...newFile};
-            res.status(201).json(newFile);
+            delete newFile._id;
+            return res.status(201).json(newFile);
 
         };
         const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -71,4 +71,115 @@ exports.addFile = async(req, res)=>{
             error: err.message
         })
     }
-}
+};
+
+exports.getShow = async(req, res)=>{
+    try{
+        let fileId = req.params.id;
+        fileId = new ObjectId(fileId);
+        const tokenKey = `auth_${req.headers['x-token']}`;
+        let user_id = await redisClient.get(tokenKey);
+        user_id = new ObjectId(user_id);
+        const user = await dbClient.User.findOne({_id:user_id});
+        if (!user) throw new Error('Unauthorized');
+        const file = await dbClient.File.findOne({_id: fileId, userId: user_id});
+        if (!file){
+            return res.status(404).json({
+                error: 'Not found'
+            });
+        };
+        res.status(200).json(file);
+
+    }catch(err){
+        res.status(401).json({
+            error: err.message
+        })
+    }
+};
+
+exports.getIndex = async(req, res)=>{
+    try{
+        const tokenKey = `auth_${req.headers['x-token']}`;
+        let user_id = await redisClient.get(tokenKey);
+        console.log(user_id);
+        user_id = new ObjectId(user_id);
+        const user = await dbClient.User.findOne({_id:user_id});
+        if(!user) throw new Error('Unauthorized');
+        console.log(user);
+        let {parentId, page} = req.query;
+        if (!parentId){
+            parentId = "0";
+        }else{
+            parentId = new ObjectId(parentId);
+        };
+        if (!page){
+            page = 0;
+        }else{
+            page = parseInt(page);
+        };
+        let limit = 20;
+        let skip = page * limit;
+        const files = await dbClient.File.find({parentId}).skip(skip).limit(limit).toArray();
+        res.status(200).json(files);
+    }catch(err){
+        res.status(401).json({
+            error: err.message
+        });
+    }
+};
+
+exports.putPublish = async(req, res)=>{
+    try{
+        let fileId = req.params.id;
+        fileId = new ObjectId(fileId);
+        const tokenKey = `auth_${req.headers['x-token']}`;
+        let user_id = await redisClient.get(tokenKey);
+        user_id = new ObjectId(user_id);
+        const user = await dbClient.User.findOne({_id:user_id});
+        if (!user) throw new Error('Unauthorized');
+        const file = await dbClient.File.findOne({_id: fileId, userId: user_id});
+        if (!file){
+            return res.status(404).json({
+                error: 'Not found'
+            });
+        };
+        await dbClient.File.updateOne({_id:fileId}, {$set: {isPublic: true}});
+        res.status(200).json({
+            ...file,
+            isPublic: true
+        });
+
+    }catch(err){
+        res.status(401).json({
+            error: err.message
+        })
+    }
+};
+
+exports.putUnpublish = async(req, res)=>{
+    try{
+        let fileId = req.params.id;
+        fileId = new ObjectId(fileId);
+        const tokenKey = `auth_${req.headers['x-token']}`;
+        let user_id = await redisClient.get(tokenKey);
+        user_id = new ObjectId(user_id);
+        const user = await dbClient.User.findOne({_id:user_id});
+        if (!user) throw new Error('Unauthorized');
+        const file = await dbClient.File.findOne({_id: fileId, userId: user_id});
+        if (!file){
+            return res.status(404).json({
+                error: 'Not found'
+            });
+        };
+        await dbClient.File.updateOne({_id:fileId}, {$set: {isPublic: false}});
+        res.status(200).json({
+            ...file,
+            isPublic: false
+        })
+
+    }catch(err){
+        res.status(401).json({
+            error: err.message
+        })
+    }
+};
