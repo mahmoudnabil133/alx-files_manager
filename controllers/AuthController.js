@@ -1,5 +1,4 @@
 const uuid = require('uuid');
-const { ObjectId } = require('mongodb');
 const sha1 = require('sha1');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
@@ -28,23 +27,6 @@ exports.getDisconnect = async (req, res) => {
     const tokenKey = `auth_${token}`;
     redisClient.del(tokenKey);
     return res.status(204).end();
-  } catch (err) {
-    return res.status(401).json({ error: err.message });
-  }
-};
-
-exports.getMe = async (req, res) => {
-  try {
-    const token = req.headers['x-token'];
-    const tokenKey = `auth_${token}`;
-    const strId = await redisClient.get(tokenKey);
-    const userId = new ObjectId(strId);
-    const user = await dbClient.User.findOne({ _id: userId });
-    if (!user) throw new Error('Unauthorized');
-    return res.status(200).json({
-      id: user._id,
-      email: user.email,
-    });
   } catch (err) {
     return res.status(401).json({ error: err.message });
   }
