@@ -1,10 +1,10 @@
 const express = require('express');
 
 const router = express.Router();
-const AppController = require('../contrallers/AppController');
-const UsersController = require('../contrallers/UsersController');
-const AuthContraller = require('../contrallers/AuthController');
-const FilesController = require('../contrallers/FilesController');
+const AppController = require('../controllers/AppController');
+const UsersController = require('../controllers/UsersController');
+const AuthContraller = require('../controllers/AuthController');
+const FilesController = require('../controllers/FilesController');
 
 // get status
 router.get('/status', AppController.status);
