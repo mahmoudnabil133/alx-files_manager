@@ -26,7 +26,7 @@ exports.gitDisconnect = async (req, res) => {
     const token = req.headers['x-token'];
     if (!token) throw new Error('Unauthorized');
     const tokenKey = `auth_${token}`;
-    redisClient.client.del(tokenKey);
+    redisClient.del(tokenKey);
     res.status(204).end();
   } catch (err) {
     res.status(401).json({ error: err.message });
