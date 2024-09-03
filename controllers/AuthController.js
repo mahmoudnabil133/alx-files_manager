@@ -53,8 +53,8 @@ exports.getMe = async (req, res) => {
 exports.getEncodedCredentials = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) throw new Error('Missing email');
-    if (!password) throw new Error('Missing password');
+    // if (!email) throw new Error('Missing email');
+    // if (!password) throw new Error('Missing password');
     const encodedCredentials = Buffer.from(`${email}:${password}`).toString('base64');
     res.status(200).json({
       encodedCredentials,
