@@ -6,7 +6,7 @@ const RedisClient = class {
     this.client = redis.createClient();
     this.isClientConnected = true;
     this.client.on('connect', () => {
-      // console.log('Redis client connected to the server');
+      console.log('Redis client connected to the server');
       this.isClientConnected = true;
     });
     this.client.on('error', (err) => {
