@@ -1,7 +1,7 @@
 const sha1 = require('sha1');
+const { ObjectId } = require('mongodb');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
-const { ObjectId } = require('mongodb');
 
 exports.postNew = async (req, res) => {
   try {
