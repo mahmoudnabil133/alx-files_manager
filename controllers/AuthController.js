@@ -42,8 +42,8 @@ exports.getMe = async (req, res) => {
     const user = await dbClient.User.findOne({ _id: userId });
     if (!user) throw new Error('Unauthorized');
     res.status(200).json({
-      email: user.email,
       id: user._id,
+      email: user.email
     });
   } catch (err) {
     res.status(401).json({ error: err.message });
