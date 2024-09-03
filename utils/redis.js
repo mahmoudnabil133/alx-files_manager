@@ -5,7 +5,7 @@ const RedisClient = class {
   constructor() {
     this.client = redis.createClient();
     this.client.on('connect', () => {
-      console.log('Redis client connected to the server');
+      // console.log('Redis client connected to the server');
     });
     this.client.on('error', (err) => {
       console.log(`Redis client not connected to the server: ${err}`);
@@ -29,7 +29,7 @@ const RedisClient = class {
 
   async set(key, value, duration) {
     try {
-      await this.client.setex(key, duration, value);
+      this.client.setex(key, duration, value);
       return true;
     } catch (err) {
       console.log('errrrrrrrrrrrrrr set');
