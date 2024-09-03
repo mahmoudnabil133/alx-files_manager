@@ -7,7 +7,7 @@ const redisClient = require('../utils/redis');
 
 exports.postUpload = async (req, res) => {
   try {
-    const token = req.headers['x-token'];
+    const token = req.header('X-Token');
     const tokenKey = `auth_${token}`;
     const strId = await redisClient.get(tokenKey);
     const userId = new ObjectId(strId);
@@ -81,7 +81,7 @@ exports.getShow = async (req, res) => {
   try {
     let fileId = req.params.id;
     fileId = new ObjectId(fileId);
-    const tokenKey = `auth_${req.headers['x-token']}`;
+    const tokenKey = `auth_${req.header('X-Token')}`;
     let userId = await redisClient.get(tokenKey);
     userId = new ObjectId(userId);
     const user = await dbClient.User.findOne({ _id: userId });
@@ -102,7 +102,7 @@ exports.getShow = async (req, res) => {
 
 exports.getIndex = async (req, res) => {
   try {
-    const tokenKey = `auth_${req.headers['x-token']}`;
+    const tokenKey = `auth_${req.header('X-Token')}`;
     let userId = await redisClient.get(tokenKey);
     console.log(userId);
     userId = new ObjectId(userId);
@@ -135,7 +135,7 @@ exports.putPublish = async (req, res) => {
   try {
     let fileId = req.params.id;
     fileId = new ObjectId(fileId);
-    const tokenKey = `auth_${req.headers['x-token']}`;
+    const tokenKey = `auth_${req.header('X-Token')}`;
     let userId = await redisClient.get(tokenKey);
     userId = new ObjectId(userId);
     const user = await dbClient.User.findOne({ _id: userId });
@@ -162,7 +162,7 @@ exports.putUnpublish = async (req, res) => {
   try {
     let fileId = req.params.id;
     fileId = new ObjectId(fileId);
-    const tokenKey = `auth_${req.headers['x-token']}`;
+    const tokenKey = `auth_${req.header('X-Token')}`;
     let userId = await redisClient.get(tokenKey);
     userId = new ObjectId(userId);
     const user = await dbClient.User.findOne({ _id: userId });
@@ -189,7 +189,7 @@ exports.getFile = async (req, res) => {
   try {
     let fileId = req.params.id;
     fileId = new ObjectId(fileId);
-    const tokenKey = `auth_${req.headers['x-token']}`;
+    const tokenKey = `auth_${req.header('X-Token')}`;
     let userId = await redisClient.get(tokenKey);
     userId = new ObjectId(userId);
     const file = await dbClient.File.findOne({ _id: fileId });

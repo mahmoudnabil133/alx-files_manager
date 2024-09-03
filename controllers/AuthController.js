@@ -22,7 +22,7 @@ exports.getConnect = async (req, res) => {
 
 exports.getDisconnect = async (req, res) => {
   try {
-    const token = req.headers['x-token'];
+    const token = req.header('X-Token');
     if (!token) throw new Error('Unauthorized');
     const tokenKey = `auth_${token}`;
     redisClient.del(tokenKey);

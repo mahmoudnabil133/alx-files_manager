@@ -28,7 +28,7 @@ exports.postNew = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    const token = req.headers['x-token'];
+    const token = req.header('X-Token');
     const tokenKey = `auth_${token}`;
     const strId = await redisClient.get(tokenKey);
     const userId = new ObjectId(strId);
