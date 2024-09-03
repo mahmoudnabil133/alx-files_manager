@@ -15,21 +15,21 @@ exports.getConnect = async (req, res) => {
     const token = uuid.v4();
     const tokenKey = `auth_${token}`;
     redisClient.set(tokenKey, user._id.toString(), 86400);
-    res.status(200).json({ token });
+    return res.status(200).json({ token });
   } catch (err) {
-    res.status(401).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 };
 
-exports.gitDisconnect = async (req, res) => {
+exports.getDisconnect = async (req, res) => {
   try {
     const token = req.headers['x-token'];
     if (!token) throw new Error('Unauthorized');
     const tokenKey = `auth_${token}`;
     redisClient.del(tokenKey);
-    res.status(204).end();
+    return res.status(204).end();
   } catch (err) {
-    res.status(401).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 };
 
@@ -41,12 +41,12 @@ exports.getMe = async (req, res) => {
     const userId = new ObjectId(strId);
     const user = await dbClient.User.findOne({ _id: userId });
     if (!user) throw new Error('Unauthorized');
-    res.status(200).json({
+    return res.status(200).json({
       id: user._id,
-      email: user.email
+      email: user.email,
     });
   } catch (err) {
-    res.status(401).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 };
 

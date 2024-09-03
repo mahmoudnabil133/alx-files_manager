@@ -16,7 +16,7 @@ router.post('/encodedCredentials', AuthContraller.getEncodedCredentials);
 
 // user auth
 router.get('/connect', AuthContraller.getConnect);
-router.get('/disconnect', AuthContraller.gitDisconnect);
+router.get('/disconnect', AuthContraller.getDisconnect);
 router.get('/users/me', AuthContraller.getMe);
 
 // files routes
