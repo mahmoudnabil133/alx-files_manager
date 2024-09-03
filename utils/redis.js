@@ -39,6 +39,11 @@ const RedisClient = class {
       return (err);
     }
   }
+
+  async del(key) {
+    this.client.del(key);
+    return true;
+  }
 };
 
 const redisClient = new RedisClient();
