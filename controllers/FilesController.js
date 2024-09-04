@@ -2,9 +2,10 @@ const { ObjectId } = require('mongodb');
 const uuid = require('uuid');
 const fs = require('fs');
 const mime = require('mime-types');
+const Queue = require('bull');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
-const Queue = require('bull');
+
 exports.postUpload = async (req, res) => {
   try {
     const token = req.header('X-Token');
@@ -69,9 +70,9 @@ exports.postUpload = async (req, res) => {
     } catch (err) {
       throw new Error('Cannot write file');
     }
-    if (type === "image"){
+    if (type === 'image') {
       const fileQueue = new Queue('images');
-      fileQueue.add({userId, fileId: file.insertedId});
+      fileQueue.add({ userId, fileId: file.insertedId });
       console.log('Job added with id: ', file.insertedId, 'userid=', userId);
     }
     return res.status(201).json(newFile);
@@ -215,11 +216,10 @@ exports.getFile = async (req, res) => {
     }
     let data;
     if (file.type === 'image') {
-      const {size} = req.query;
+      const { size } = req.query;
       if (size) {
         file.localPath = `${file.localPath}_${size}`;
         // file.localPath = `${file.localPath.split('.')[0]}_${size}.png`;
-
       }
     }
     try {
