@@ -4,7 +4,7 @@ const fs = require('fs');
 const mime = require('mime-types');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
-
+const Queue = require('bull');
 exports.postUpload = async (req, res) => {
   try {
     const token = req.header('X-Token');
@@ -45,13 +45,13 @@ exports.postUpload = async (req, res) => {
     };
     if (type === 'folder') {
       const folder = await dbClient.File.insertOne(newFile);
-      // newFile.id = folder.insertedId;
       newFile = { id: folder.insertedId, ...newFile };
       delete newFile._id;
       return res.status(201).json(newFile);
     }
     const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
     const fileName = uuid.v4();
+    // const fileName = name;
     const filePath = `${folderPath}/${fileName}`;
     newFile.localPath = filePath;
     const file = await dbClient.File.insertOne(newFile);
@@ -63,11 +63,16 @@ exports.postUpload = async (req, res) => {
         throw new Error('Cannot create folder path');
       }
     }
-    const decodedData = Buffer.from(data, 'base64').toString('utf-8');
+    const decodedData = Buffer.from(data, 'base64');
     try {
       await fs.writeFileSync(filePath, decodedData);
     } catch (err) {
       throw new Error('Cannot write file');
+    }
+    if (type === "image"){
+      const fileQueue = new Queue('images');
+      fileQueue.add({userId, fileId: file.insertedId});
+      console.log('Job added with id: ', file.insertedId, 'userid=', userId);
     }
     return res.status(201).json(newFile);
   } catch (err) {
@@ -209,6 +214,14 @@ exports.getFile = async (req, res) => {
       });
     }
     let data;
+    if (file.type === 'image') {
+      const {size} = req.query;
+      if (size) {
+        file.localPath = `${file.localPath}_${size}`;
+        // file.localPath = `${file.localPath.split('.')[0]}_${size}.png`;
+
+      }
+    }
     try {
       data = await fs.readFileSync(file.localPath, 'utf-8');
     } catch (err) {
