@@ -73,7 +73,6 @@ exports.postUpload = async (req, res) => {
     if (type === 'image') {
       const fileQueue = new Queue('images');
       fileQueue.add({ userId, fileId: file.insertedId });
-      console.log('Job added with id: ', file.insertedId, 'userid=', userId);
     }
     return res.status(201).json(newFile);
   } catch (err) {
